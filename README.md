@@ -31,6 +31,8 @@ Go to the project directory
   cd convoke
 ```
 
+Rename `config.example.yaml` to `config.yaml` and populate the values
+
 Start the server
 
 ```bash
