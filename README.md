@@ -11,8 +11,8 @@ An multiplayer system written in go, using rethinkDB and websockets
 | Matchmaking | 📆 |
 | P2P Logic   | 📆 |
 | Player Data | 📆 |
-| WebUI       | ❌ |
-| Godot Addon | ❌ |
+| WebUI       | 📆 |
+| Godot Addon | 📆 |
 
 ✅ - Done | 🔨 - In Progress | 📆 - Planned | ❌ - Not Planned
 
