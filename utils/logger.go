@@ -39,7 +39,7 @@ func GetColor(color string) string {
 	return color
 }
 
-func LogInfo(message string, color string) {
+func Log(message string, color string) {
 	color = GetColor(color)
 
 	log.Printf("| %s%s%s\n", color, message, Reset)

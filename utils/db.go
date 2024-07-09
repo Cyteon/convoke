@@ -6,8 +6,8 @@ import (
 
 var session *r.Session
 
-func LoadDB() {
-	LogInfo("Loading DB", "")
+func LoadDB() *r.Session {
+	Log("Loading DB", "")
 
 	config := LoadConfig("config.yaml")
 
@@ -23,8 +23,10 @@ func LoadDB() {
 	}
 
 	if session.IsConnected() {
-		LogInfo("Connected to DB", "green")
+		Log("Connected to DB", "green")
 	} else {
 		LogFatal("DB Error, not connected", "red")
 	}
+
+	return session
 }

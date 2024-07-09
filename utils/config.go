@@ -7,9 +7,13 @@ import (
 )
 
 type Config struct {
-	DbUrl  string `yaml:"dbUrl"`
-	DbUser string `yaml:"dbUser"`
-	DbPass string `yaml:"dbPass"`
+	DbUrl     string `yaml:"dbUrl"`
+	DbUser    string `yaml:"dbUser"`
+	DbPass    string `yaml:"dbPass"`
+	Websocket struct {
+		Host string `yaml:"host"`
+		Port string `yaml:"port"`
+	}
 }
 
 func LoadConfig(configPath string) Config {
