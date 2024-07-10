@@ -19,6 +19,8 @@ func HandlePing(w http.ResponseWriter, r *http.Request) {
 	utils.Log("Connection opened with "+r.RemoteAddr, "")
 
 	for {
+		// We just return what the client sent back to them
+
 		messageType, p, err := conn.ReadMessage()
 		if err != nil {
 			utils.Log("Error reading message, "+err.Error(), "red")
