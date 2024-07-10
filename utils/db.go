@@ -7,7 +7,7 @@ import (
 var session *r.Session
 
 func LoadDB() *r.Session {
-	Log("Loading DB", "")
+	Log("Connection to DB", "")
 
 	config := LoadConfig("config.yaml")
 
