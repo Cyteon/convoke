@@ -1,7 +1,7 @@
 # convoke
 > Open for name suggestions
 
-An multiplayer system written in go, using rethinkDB and websockets
+An game server written in go, using rethinkDB and websockets
 
 
 ## Features:
