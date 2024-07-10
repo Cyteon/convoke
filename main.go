@@ -2,7 +2,7 @@ package main
 
 import (
 	"convoke/server/api"
-	"convoke/server/api/users"
+	"convoke/server/api/players"
 	"convoke/server/ws"
 	"convoke/utils"
 	"log"
@@ -23,7 +23,7 @@ func main() {
 	utils.Log("Loading api routes", "")
 	http.HandleFunc("/api/ping", api.HandlePing)
 
-	http.HandleFunc("/api/users/new", users.HandleNew)
+	http.HandleFunc("/api/players/new", players.HandleNew)
 
 	utils.Log("Listening on "+config.Websocket.Host+":"+config.Websocket.Port, "green")
 

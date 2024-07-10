@@ -45,15 +45,15 @@ func SetupDB() *r.Session {
 
 	Session.Use("convoke")
 
-	_, err = r.TableCreate("users").RunWrite(Session)
+	_, err = r.TableCreate("players").RunWrite(Session)
 	if err != nil {
-		if !strings.Contains(err.Error(), "Table `convoke.users` already exists") {
+		if !strings.Contains(err.Error(), "Table `convoke.players` already exists") {
 			LogFatal("Error setting up DB: "+err.Error(), "red")
 		} else {
-			Log("Table 'convoke.users' already exists, continuing setup", "yellow")
+			Log("Table 'convoke.players' already exists, continuing setup", "yellow")
 		}
 	} else {
-		Log("Table 'users' created successfully", "green")
+		Log("Table 'players' created successfully", "green")
 	}
 
 	Log("Database and table setup complete", "green")

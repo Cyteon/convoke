@@ -1,4 +1,4 @@
-package users
+package players
 
 import (
 	"convoke/utils"
@@ -41,7 +41,7 @@ func HandleNew(w http.ResponseWriter, r *http.Request) {
 	session := utils.LoadDB()
 
 	// Check if the username or email already exists
-	cursor, err := rethink.DB("convoke").Table("users").Filter(rethink.Row.Field("Username").Eq(user.Username)).Run(session)
+	cursor, err := rethink.DB("convoke").Table("players").Filter(rethink.Row.Field("Username").Eq(user.Username)).Run(session)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -54,7 +54,7 @@ func HandleNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cursor, err = rethink.DB("convoke").Table("users").Filter(rethink.Row.Field("Email").Eq(user.Email)).Run(session)
+	cursor, err = rethink.DB("convoke").Table("players").Filter(rethink.Row.Field("Email").Eq(user.Email)).Run(session)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -84,7 +84,7 @@ func HandleNew(w http.ResponseWriter, r *http.Request) {
 
 	user.Password = hash
 
-	_, err = rethink.DB("convoke").Table("users").Insert(user).RunWrite(session)
+	_, err = rethink.DB("convoke").Table("players").Insert(user).RunWrite(session)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
