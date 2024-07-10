@@ -1,7 +1,8 @@
 package main
 
 import (
-	"convoke/server"
+	"convoke/server/api"
+	"convoke/server/ws"
 	"convoke/utils"
 	"log"
 	"net/http"
@@ -15,8 +16,11 @@ func main() {
 	session := utils.LoadDB()
 	defer session.Close()
 
-	utils.Log("Loading routes", "")
-	http.HandleFunc("/ping", server.HandlePing)
+	utils.Log("Loading websocket routes", "")
+	http.HandleFunc("/ws/ping", ws.HandlePing)
+
+	utils.Log("Loading api routes", "")
+	http.HandleFunc("/api/ping", api.HandlePing)
 
 	utils.Log("Listening on "+config.Websocket.Host+":"+config.Websocket.Port, "green")
 
