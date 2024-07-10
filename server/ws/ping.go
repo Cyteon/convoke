@@ -1,13 +1,14 @@
-package server
+package ws
 
 import (
 	"net/http"
 
+	"convoke/server"
 	"convoke/utils"
 )
 
 func HandlePing(w http.ResponseWriter, r *http.Request) {
-	conn, err := GetUpgrader().Upgrade(w, r, nil)
+	conn, err := server.Upgrader.Upgrade(w, r, nil)
 
 	if err != nil {
 		utils.Log("Error upgrading connection, "+err.Error(), "red")
