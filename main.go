@@ -2,6 +2,7 @@ package main
 
 import (
 	"convoke/server/api"
+	"convoke/server/api/users"
 	"convoke/server/ws"
 	"convoke/utils"
 	"log"
@@ -13,7 +14,7 @@ func main() {
 
 	config := utils.LoadConfig("config.yaml")
 
-	session := utils.LoadDB()
+	session := utils.SetupDB()
 	defer session.Close()
 
 	utils.Log("Loading websocket routes", "")
@@ -21,6 +22,8 @@ func main() {
 
 	utils.Log("Loading api routes", "")
 	http.HandleFunc("/api/ping", api.HandlePing)
+
+	http.HandleFunc("/api/users/new", users.HandleNew)
 
 	utils.Log("Listening on "+config.Websocket.Host+":"+config.Websocket.Port, "green")
 
