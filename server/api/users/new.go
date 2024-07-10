@@ -4,13 +4,14 @@ import (
 	"convoke/utils"
 	"encoding/json"
 	"net/http"
+
+	rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
 )
 
 type User struct {
 	Username string
 	Password string
 	Email    string
-	PassHash string
 }
 
 func HandleNew(w http.ResponseWriter, r *http.Request) {
@@ -33,6 +34,32 @@ func HandleNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	session := utils.LoadDB()
+
+	cursor, err := rethink.DB("convoke").Table("users").Filter(rethink.Row.Field("Username").Eq(user.Username)).Run(session)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer cursor.Close()
+
+	if cursor.IsNil() == false {
+		http.Error(w, "Username already exists", http.StatusConflict)
+		return
+	}
+
+	cursor, err = rethink.DB("convoke").Table("users").Filter(rethink.Row.Field("Email").Eq(user.Email)).Run(session)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer cursor.Close()
+
+	if cursor.IsNil() == false {
+		http.Error(w, "Email already exists", http.StatusConflict)
+		return
+	}
+
 	hash, err := utils.HashPassword(user.Password)
 
 	if err != nil {
@@ -40,14 +67,21 @@ func HandleNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user.PassHash = hash
-
-	if !utils.CheckPasswordHash(user.Password, user.PassHash) {
+	if !utils.CheckPasswordHash(user.Password, hash) {
 		http.Error(w, "Hashing error", http.StatusInternalServerError)
 		return
 	}
 
-	utils.Log("Creating user: "+user.Username+" with hash: "+user.PassHash, "")
+	user.Password = hash
+
+	_, err = rethink.DB("convoke").Table("users").Insert(user).RunWrite(session)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	utils.Log("Created user: "+user.Username, "")
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]string{"message": "User created successfully"})

@@ -9,8 +9,6 @@ import (
 var Session *r.Session
 
 func LoadDB() *r.Session {
-	Log("Connecting to DB", "")
-
 	config := LoadConfig("config.yaml")
 
 	Session, err := r.Connect(r.ConnectOpts{
@@ -24,18 +22,13 @@ func LoadDB() *r.Session {
 		LogFatal("DB Connection Error, "+err.Error(), "red")
 	}
 
-	if Session.IsConnected() {
-		Log("Connected to DB", "green")
-	} else {
-		LogFatal("DB Error, not connected", "red")
-	}
-
 	return Session
 }
 
 func SetupDB() *r.Session {
 	Log("Setting up DB", "")
 
+	Log("Connecting to DB", "")
 	Session := LoadDB()
 
 	_, err := r.DBCreate("convoke").RunWrite(Session)
@@ -64,6 +57,12 @@ func SetupDB() *r.Session {
 	}
 
 	Log("Database and table setup complete", "green")
+
+	if Session.IsConnected() {
+		Log("Connected to DB", "green")
+	} else {
+		LogFatal("DB Error, not connected", "red")
+	}
 
 	return Session
 }
