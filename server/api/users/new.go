@@ -12,9 +12,11 @@ type User struct {
 	Username string
 	Password string
 	Email    string
+	Friends  []string
 }
 
 func HandleNew(w http.ResponseWriter, r *http.Request) {
+	// Only POST
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -22,6 +24,7 @@ func HandleNew(w http.ResponseWriter, r *http.Request) {
 
 	var user User
 
+	// Decode the JSON
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -30,12 +33,14 @@ func HandleNew(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	if user.Username == "" || user.Password == "" || user.Email == "" {
-		http.Error(w, "Missing required fields", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "username already exists"})
 		return
 	}
 
 	session := utils.LoadDB()
 
+	// Check if the username or email already exists
 	cursor, err := rethink.DB("convoke").Table("users").Filter(rethink.Row.Field("Username").Eq(user.Username)).Run(session)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -44,7 +49,8 @@ func HandleNew(w http.ResponseWriter, r *http.Request) {
 	defer cursor.Close()
 
 	if cursor.IsNil() == false {
-		http.Error(w, "Username already exists", http.StatusConflict)
+		w.WriteHeader(http.StatusConflict)
+		json.NewEncoder(w).Encode(map[string]string{"message": "username already exists"})
 		return
 	}
 
@@ -56,10 +62,12 @@ func HandleNew(w http.ResponseWriter, r *http.Request) {
 	defer cursor.Close()
 
 	if cursor.IsNil() == false {
-		http.Error(w, "Email already exists", http.StatusConflict)
+		w.WriteHeader(http.StatusConflict)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Email already exists"})
 		return
 	}
 
+	// We have to hash the password for safe storing
 	hash, err := utils.HashPassword(user.Password)
 
 	if err != nil {
@@ -67,8 +75,10 @@ func HandleNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Make sure all the hashing stuff is working
 	if !utils.CheckPasswordHash(user.Password, hash) {
-		http.Error(w, "Hashing error", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Hashing error"})
 		return
 	}
 
