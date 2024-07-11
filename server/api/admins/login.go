@@ -29,6 +29,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
+	// Check if the request is valid
 	if login.Password == "" || login.Username == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid request"})
@@ -37,7 +38,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 
 	session := utils.LoadDB()
 
-	// Find user by email or username
+	// Find user by username
 	cursor, err := rethink.DB("convoke").Table("admins").Filter(rethink.Row.Field("Username").Eq(login.Username)).Run(session)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -55,6 +56,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check the password
 	if utils.CheckPasswordHash(login.Password, admin.Password) == false {
 		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(map[string]string{"message": "Unauthorized"})
@@ -64,6 +66,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 
 	admin.Token = utils.GenerateSecureToken(32)
 
+	// Update the token so you can only be logged in on one device
 	_, err = rethink.DB("convoke").Table("admins").Get(admin.Username).Update(map[string]string{"Token": admin.Token}).RunWrite(session)
 
 	if err != nil {
