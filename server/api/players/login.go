@@ -74,6 +74,6 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 
 	utils.Log("Authorized user: "+login.Username+""+login.Email, "")
 
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Authorized", "token": player.Token})
 }
