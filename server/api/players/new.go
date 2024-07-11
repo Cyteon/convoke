@@ -8,11 +8,12 @@ import (
 	rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
 )
 
-type User struct {
+type Player struct {
 	Username string
 	Password string
 	Email    string
 	Friends  []string
+	Token    string
 }
 
 func HandleNew(w http.ResponseWriter, r *http.Request) {
@@ -22,26 +23,26 @@ func HandleNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var user User
+	var player Player
 
 	// Decode the JSON
-	err := json.NewDecoder(r.Body).Decode(&user)
+	err := json.NewDecoder(r.Body).Decode(&player)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	defer r.Body.Close()
 
-	if user.Username == "" || user.Password == "" || user.Email == "" {
+	if player.Username == "" || player.Password == "" || player.Email == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"message": "username already exists"})
+		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid request"})
 		return
 	}
 
 	session := utils.LoadDB()
 
 	// Check if the username or email already exists
-	cursor, err := rethink.DB("convoke").Table("players").Filter(rethink.Row.Field("Username").Eq(user.Username)).Run(session)
+	cursor, err := rethink.DB("convoke").Table("players").Filter(rethink.Row.Field("Username").Eq(player.Username)).Run(session)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -54,7 +55,7 @@ func HandleNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cursor, err = rethink.DB("convoke").Table("players").Filter(rethink.Row.Field("Email").Eq(user.Email)).Run(session)
+	cursor, err = rethink.DB("convoke").Table("players").Filter(rethink.Row.Field("Email").Eq(player.Email)).Run(session)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -68,7 +69,7 @@ func HandleNew(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// We have to hash the password for safe storing
-	hash, err := utils.HashPassword(user.Password)
+	hash, err := utils.HashPassword(player.Password)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -76,23 +77,42 @@ func HandleNew(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Make sure all the hashing stuff is working
-	if !utils.CheckPasswordHash(user.Password, hash) {
+	if !utils.CheckPasswordHash(player.Password, hash) {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"message": "Hashing error"})
 		return
 	}
 
-	user.Password = hash
+	player.Password = hash
 
-	_, err = rethink.DB("convoke").Table("players").Insert(user).RunWrite(session)
+	var token string
+
+	for {
+		token = utils.GenerateSecureToken(32)
+
+		cursor, err = rethink.DB("convoke").Table("players").Filter(rethink.Row.Field("Token").Eq(token)).Run(session)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if cursor.IsNil() {
+			break
+		}
+	}
+
+	player.Token = token
+
+	_, err = rethink.DB("convoke").Table("players").Insert(player).RunWrite(session)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	utils.Log("Created user: "+user.Username, "")
+	utils.Log("Created user: "+player.Username, "")
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]string{"message": "User created successfully"})
+	json.NewEncoder(w).Encode(map[string]string{"message": "User created successfully", "token": token})
 }

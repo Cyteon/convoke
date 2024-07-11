@@ -24,6 +24,7 @@ func main() {
 	http.HandleFunc("/api/ping", api.HandlePing)
 
 	http.HandleFunc("/api/players/new", players.HandleNew)
+	http.HandleFunc("/api/players/login", players.HandleLogin)
 
 	utils.Log("Listening on "+config.Websocket.Host+":"+config.Websocket.Port, "green")
 
