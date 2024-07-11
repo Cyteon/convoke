@@ -56,6 +56,40 @@ func SetupDB() *r.Session {
 		Log("Table 'players' created successfully", "green")
 	}
 
+	_, err = r.TableCreate("admins").RunWrite(Session)
+	if err != nil {
+		if !strings.Contains(err.Error(), "Table `convoke.admins` already exists") {
+			LogFatal("Error setting up DB: "+err.Error(), "red")
+		} else {
+			Log("Table 'convoke.admins' already exists, continuing setup", "yellow")
+		}
+	} else {
+		Log("Table 'admins' created successfully", "green")
+
+		Log("Creating default admin user", "green")
+
+		password, err := HashPassword("admin")
+
+		if err != nil {
+			LogFatal("Error hashing password: "+err.Error(), "red")
+		}
+
+		_, err = r.Table("admins").Insert(map[string]string{
+			"Username": "admin",
+			"Password": password,
+		}).RunWrite(Session)
+
+		if err != nil {
+			LogFatal("Error creating default admin user: "+err.Error(), "red")
+		}
+
+		Log("Default admin user created successfully", "green")
+
+		Log("WARNING: Default admin user created with username 'admin' and password 'admin'", "red")
+		Log("Please change the password immediately", "red")
+
+	}
+
 	Log("Database and table setup complete", "green")
 
 	if Session.IsConnected() {
