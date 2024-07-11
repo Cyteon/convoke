@@ -1,4 +1,4 @@
-# convoke
+# Convoke: A game server in go
 > Open for name suggestions
 
 An game server written in go, using rethinkDB and websockets

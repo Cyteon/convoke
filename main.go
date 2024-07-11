@@ -7,6 +7,8 @@ import (
 	"convoke/utils"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -17,16 +19,19 @@ func main() {
 	session := utils.SetupDB()
 	defer session.Close()
 
+	router := mux.NewRouter()
+
 	utils.Log("Loading websocket routes", "")
-	http.HandleFunc("/ws/ping", ws.HandlePing)
+	router.HandleFunc("/ws/{slug}", ws.HandleConnection)
+	router.HandleFunc("/ws/ping", ws.HandlePing)
 
 	utils.Log("Loading api routes", "")
-	http.HandleFunc("/api/ping", api.HandlePing)
+	router.HandleFunc("/api/ping", api.HandlePing)
 
-	http.HandleFunc("/api/players/new", players.HandleNew)
-	http.HandleFunc("/api/players/login", players.HandleLogin)
+	router.HandleFunc("/api/players/new", players.HandleNew)
+	router.HandleFunc("/api/players/login", players.HandleLogin)
 
 	utils.Log("Listening on "+config.Websocket.Host+":"+config.Websocket.Port, "green")
 
-	log.Fatal(http.ListenAndServe(config.Websocket.Host+":"+config.Websocket.Port, nil))
+	log.Fatal(http.ListenAndServe(config.Websocket.Host+":"+config.Websocket.Port, router))
 }
