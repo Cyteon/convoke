@@ -11,13 +11,13 @@
         </div>
         <div class="sidebar-bottom">
             <hr />
-            <button class="sidebar-button" href="/ui/admin/settings">
+            <button class="sidebar-button" href="/ui/admin/admins">
                 Admins
             </button>
             <button class="sidebar-button" href="/ui/admin/settings">
                 Settings
             </button>
-            <button class="sidebar-button" href="/ui/admin/logout">
+            <button class="sidebar-button logout" href="/ui/login">
                 Logout
             </button>
         </div>
@@ -105,5 +105,11 @@
             e.preventDefault();
             window.location.href = e.target.getAttribute("href");
         });
+    });
+
+    document.querySelector(".logout").addEventListener("click", (e) => {
+        e.preventDefault();
+        localStorage.removeItem("token");
+        window.location.href = "/ui/login";
     });
 </script>
