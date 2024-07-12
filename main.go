@@ -2,8 +2,8 @@ package main
 
 import (
 	"convoke/server/api"
-	"convoke/server/api/admins"
-	"convoke/server/api/players"
+	"convoke/server/api/admin"
+	"convoke/server/api/player"
 	"convoke/server/ui"
 	"convoke/server/ws"
 	"convoke/utils"
@@ -30,10 +30,11 @@ func main() {
 	utils.Log("Loading api routes", "")
 	router.HandleFunc("/api/ping", api.HandlePing).Methods("GET", "POST")
 
-	router.HandleFunc("/api/players/new", players.HandleNew).Methods("POST")
-	router.HandleFunc("/api/players/login", players.HandleLogin).Methods("POST")
+	router.HandleFunc("/api/player/new", player.HandleNew).Methods("POST")
+	router.HandleFunc("/api/player/login", player.HandleLogin).Methods("POST")
 
-	router.HandleFunc("/api/admins/login", admins.HandleLogin).Methods("POST")
+	router.HandleFunc("/api/admin/login", admin.HandleLogin).Methods("POST")
+	router.HandleFunc("/api/admin/verify", admin.HandleVerify).Methods("POST")
 
 	utils.Log("Loading webui routes", "")
 	router.HandleFunc("/ui/login", ui.HandleLogin).Methods("GET")

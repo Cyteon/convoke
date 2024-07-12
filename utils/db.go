@@ -77,6 +77,7 @@ func SetupDB() *r.Session {
 		_, err = r.Table("admins").Insert(map[string]string{
 			"Username": "admin",
 			"Password": password,
+			"Token":    ".",
 		}).RunWrite(Session)
 
 		if err != nil {

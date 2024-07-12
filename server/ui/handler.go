@@ -6,6 +6,7 @@ import (
 	"text/template"
 )
 
+// Just show the HTML
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles(filepath.Join("server", "ui", "login", "index.html"))
 	if err != nil {

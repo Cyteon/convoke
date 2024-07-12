@@ -1,4 +1,4 @@
-package players
+package player
 
 import (
 	"convoke/utils"

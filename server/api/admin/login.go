@@ -1,4 +1,4 @@
-package admins
+package admin
 
 import (
 	"convoke/utils"
@@ -14,6 +14,7 @@ type Login struct {
 }
 
 type Admin struct {
+	ID       string
 	Username string
 	Password string
 	Token    string
@@ -64,18 +65,18 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	admin.Token = utils.GenerateSecureToken(32)
+	token := utils.GenerateSecureToken(32)
 
 	// Update the token so you can only be logged in on one device
-	_, err = rethink.DB("convoke").Table("admins").Get(admin.Username).Update(map[string]string{"Token": admin.Token}).RunWrite(session)
+	_, err = rethink.DB("convoke").Table("admins").Get(admin.ID).Update(map[string]string{"Token": token}).RunWrite(session)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	utils.Log("Authorized admin: "+admin.Username, "")
+	utils.Log("Admin: "+admin.Username+" logged in", "")
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Authorized", "token": admin.Token})
+	json.NewEncoder(w).Encode(map[string]string{"message": "Authorized", "token": token})
 }
