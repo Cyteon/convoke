@@ -12,7 +12,7 @@ An game server written in go, using rethinkDB and websockets
 | P2P Logic   | 🔨 |
 | Player Data | 📆 |
 | WebUI       | 🔨 |
-| Godot Addon | 🔨 |
+| [Godot Addon](https://github.com/Cyteon/convoke-godot) | 🔨 |
 | Basic rooms | 🔨 |
 
 ✅ - Done | 🔨 - In Progress | 📆 - Planned | ❌ - Not Planned
