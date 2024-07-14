@@ -6,6 +6,7 @@ import (
 	"convoke/server/api/player"
 	"convoke/server/ui"
 	"convoke/server/ws"
+	"convoke/server/ws/room"
 	"convoke/utils"
 	"log"
 	"net/http"
@@ -24,7 +25,7 @@ func main() {
 	router := mux.NewRouter()
 
 	utils.Log("Loading websocket routes", "")
-	router.HandleFunc("/ws/{slug}", ws.HandleConnection)
+	router.HandleFunc("/ws/room/{slug}", room.HandleConnection)
 	router.HandleFunc("/ws/ping", ws.HandlePing)
 
 	utils.Log("Loading api routes", "")
@@ -41,6 +42,7 @@ func main() {
 	router.HandleFunc("/ui/admin", ui.HandleAdmin).Methods("GET")
 
 	utils.Log("Listening on "+config.Websocket.Host+":"+config.Websocket.Port, "green")
+	utils.Log("Admin interface at http://"+config.Websocket.Host+":"+config.Websocket.Port+"/ui/admin", "green")
 
 	log.Fatal(http.ListenAndServe(config.Websocket.Host+":"+config.Websocket.Port, router))
 }

@@ -49,7 +49,8 @@ func HandleVerify(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.Log("Authorized admin: "+admin.Username, "")
+	// This will print every time an admin goes to any page or refresh, so lets not have this spam logs
+	//utils.Log("Authorized admin: "+admin.Username, "")
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Authorized", "username": admin.Username})

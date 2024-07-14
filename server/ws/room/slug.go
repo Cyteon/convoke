@@ -1,4 +1,4 @@
-package ws
+package room
 
 import (
 	"encoding/json"
