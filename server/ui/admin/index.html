@@ -89,9 +89,10 @@
             .then((response) => response.json())
             .then((data) => {
                 console.log(data);
-                // You can also manipulate the DOM here to display the data
-                // For example:
-                // document.body.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+
+                if (data.status == "401") {
+                    window.location.href = "/ui/login";
+                }
             })
             .catch((error) => {
                 console.error("Error:", error);

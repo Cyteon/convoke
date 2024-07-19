@@ -5,22 +5,16 @@ import (
 	"convoke/utils"
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	rethink "gopkg.in/rethinkdb/rethinkdb-go.v6"
 )
 
 func HandleUsers(w http.ResponseWriter, r *http.Request) {
-	var login TokenLogin
-	// Decode the JSON
-	err := json.NewDecoder(r.Body).Decode(&login)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	defer r.Body.Close()
+	var token = strings.Split(r.Header.Get("Authorization"), " ")[1]
 
 	// Check if the request is valid
-	if login.Token == "" {
+	if token == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{"message": "Invalid request"})
 		return
@@ -29,7 +23,7 @@ func HandleUsers(w http.ResponseWriter, r *http.Request) {
 	session := utils.LoadDB()
 
 	// Find user by token
-	cursor, err := rethink.DB("convoke").Table("admins").Filter(rethink.Row.Field("Token").Eq(login.Token)).Run(session)
+	cursor, err := rethink.DB("convoke").Table("admins").Filter(rethink.Row.Field("Token").Eq(token)).Run(session)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -39,7 +33,7 @@ func HandleUsers(w http.ResponseWriter, r *http.Request) {
 	var admin Admin
 	if cursor.IsNil() {
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(map[string]string{"message": "Unauthorized"})
+		json.NewEncoder(w).Encode(map[string]string{"message": "Unauthorized", "status": "401"})
 		return
 	}
 	err = cursor.One(&admin)

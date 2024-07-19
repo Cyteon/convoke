@@ -1,0 +1,176 @@
+<body>
+    <div>
+        <div class="sidebar">
+            <div class="sidebar-top">
+                <button class="sidebar-button" href="/ui/admin">
+                    Overview
+                </button>
+                <button class="sidebar-button" href="/ui/admin/users">
+                    Users
+                </button>
+                <button class="sidebar-button" href="/ui/admin/lobbies">
+                    Lobbies
+                </button>
+            </div>
+            <div class="sidebar-bottom">
+                <hr />
+                <button class="sidebar-button" href="/ui/admin/admins">
+                    Admins
+                </button>
+                <button class="sidebar-button" href="/ui/admin/settings">
+                    Settings
+                </button>
+                <button class="sidebar-button logout" href="/ui/login">
+                    Logout
+                </button>
+            </div>
+        </div>
+
+        <div class="centered list"></div>
+    </div>
+</body>
+
+<style>
+    body,
+    html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 150px;
+        height: 100%;
+        padding: 6px 14px;
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+    }
+
+    .sidebar-top {
+        flex-grow: 1;
+    }
+
+    .sidebar-bottom {
+        margin-top: auto;
+        margin-bottom: 8px;
+    }
+
+    .sidebar-button {
+        width: 100%;
+        padding: 5px;
+        font-size: 1.5rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 8px;
+    }
+
+    .sidebar-button:hover {
+        transform: scale(1.05);
+    }
+
+    hr {
+        margin: 10px 0;
+        border: none;
+        border-top: 1px solid #ccc;
+    }
+
+    .centered {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .list {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: start;
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
+        width: 50%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .list-item {
+        display: flex;
+    }
+
+    p {
+        margin-left: 30px;
+    }
+</style>
+
+<script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+        window.location.href = "/ui/login";
+    } else {
+        fetch("/api/admin/verify", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ token }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+
+                if (data.status == "401") {
+                    window.location.href = "/ui/login";
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+    }
+
+    fetch("/api/admin/users", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data);
+
+            if (data.status == "401") {
+                window.location.href = "/ui/login";
+            }
+
+            const list = document.querySelector(".list");
+
+            data.users.forEach((user) => {
+                const userElement = document.createElement("div");
+                userElement.innerHTML = `
+                    <div class="list-item">
+                        <p>${user.Username}</p>
+                        <p>${user.Email}</p>
+                    </div>
+                `;
+                list.appendChild(userElement);
+            });
+        });
+
+    document.querySelectorAll(".sidebar-button").forEach((button) => {
+        button.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.location.href = e.target.getAttribute("href");
+        });
+    });
+
+    document.querySelector(".logout").addEventListener("click", (e) => {
+        e.preventDefault();
+        localStorage.removeItem("token");
+        window.location.href = "/ui/login";
+    });
+</script>

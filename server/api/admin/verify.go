@@ -45,7 +45,7 @@ func HandleVerify(w http.ResponseWriter, r *http.Request) {
 		cursor.One(&admin)
 	} else {
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(map[string]string{"message": "Unauthorized"})
+		json.NewEncoder(w).Encode(map[string]string{"message": "Unauthorized", "status": "401"})
 		return
 	}
 
