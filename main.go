@@ -36,10 +36,12 @@ func main() {
 
 	router.HandleFunc("/api/admin/login", admin.HandleLogin).Methods("POST")
 	router.HandleFunc("/api/admin/verify", admin.HandleVerify).Methods("POST")
+	router.HandleFunc("/api/admin/users", admin.HandleUsers).Methods("GET")
 
 	utils.Log("Loading webui routes", "")
 	router.HandleFunc("/ui/login", ui.HandleLogin).Methods("GET")
 	router.HandleFunc("/ui/admin", ui.HandleAdmin).Methods("GET")
+	router.HandleFunc("/ui/admin/users", ui.HandleAdminUsers).Methods("GET")
 
 	utils.Log("Listening on "+config.Websocket.Host+":"+config.Websocket.Port, "green")
 	utils.Log("Admin interface at http://"+config.Websocket.Host+":"+config.Websocket.Port+"/ui/admin", "green")

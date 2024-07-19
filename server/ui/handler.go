@@ -24,3 +24,12 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 	tmpl.Execute(w, nil)
 }
+
+func HandleAdminUsers(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles(filepath.Join("server", "ui", "admin", "users", "index.html"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	tmpl.Execute(w, nil)
+}
