@@ -1,4 +1,4 @@
-package players
+package player
 
 import (
 	"convoke/utils"
@@ -9,6 +9,7 @@ import (
 )
 
 type Player struct {
+	ID       string
 	Username string
 	Password string
 	Email    string
@@ -17,12 +18,6 @@ type Player struct {
 }
 
 func HandleNew(w http.ResponseWriter, r *http.Request) {
-	// Only POST
-	if r.Method != "POST" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	var player Player
 
 	// Decode the JSON

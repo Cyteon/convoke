@@ -1,4 +1,4 @@
-# convoke
+# Convoke: A game server in go
 > Open for name suggestions
 
 An game server written in go, using rethinkDB and websockets
@@ -9,10 +9,11 @@ An game server written in go, using rethinkDB and websockets
 | --- | --- |
 | Lobbies     | 📆 |
 | Matchmaking | 📆 |
-| P2P Logic   | 📆 |
+| P2P Logic   | 🔨 |
 | Player Data | 📆 |
-| WebUI       | 📆 |
-| Godot Addon | 📆 |
+| WebUI       | 🔨 |
+| [Godot Addon](https://github.com/Cyteon/convoke-godot) | 🔨 |
+| Basic rooms | 🔨 |
 
 ✅ - Done | 🔨 - In Progress | 📆 - Planned | ❌ - Not Planned
 
@@ -41,7 +42,7 @@ Start the server
 
 
 ## Todo:
-- [ ]  User authentication
+- [x]  Basic player authentication
 - [ ]  Create a lobby
 - [ ]  Join a lobby
 - [ ]  Chat in a lobby

@@ -1,4 +1,4 @@
-package players
+package player
 
 import (
 	"convoke/utils"
@@ -15,12 +15,6 @@ type Login struct {
 }
 
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
-	// Only POST
-	if r.Method != "POST" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	var login Login
 	var player Player
 
@@ -74,6 +68,6 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 
 	utils.Log("Authorized user: "+login.Username+""+login.Email, "")
 
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Authorized", "token": player.Token})
 }

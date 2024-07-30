@@ -1,0 +1,100 @@
+<body>
+    <div class="center">
+        <form>
+            <h1 class="center">Admin Login</h1>
+            <input type="text" name="username" placeholder="Username" />
+            <input type="password" name="password" placeholder="Password" />
+            <input class="button" type="submit" value="Login" />
+        </form>
+    </div>
+    <footer>
+        <a href="https://github.com/cyteon/convoke">Convoke Game Server</a>
+    </footer>
+</body>
+
+<style>
+    footer a {
+        position: fixed;
+        bottom: 0;
+        text-align: center;
+        padding: 10px;
+        transition: 0.5s;
+        color: black;
+        text-decoration: none;
+    }
+
+    footer:hover a {
+        color: blue;
+    }
+
+    body {
+        height: 100vh;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        border-radius: 5px;
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
+        padding: 30px 30px;
+    }
+
+    h1 {
+        margin-bottom: 10%;
+    }
+
+    .center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+    }
+
+    input {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 5px;
+        font-size: 1.5rem;
+        margin: 2px;
+    }
+
+    .button {
+        background-color: #7cb9e8;
+        cursor: pointer;
+        font-size: 1.5rem;
+        border: none;
+        border-radius: 5px;
+        padding: 5px;
+        margin: 2px;
+        /*color: #434343;*/
+    }
+</style>
+
+<script>
+    document.querySelector("form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const username = e.target.username.value;
+        const password = e.target.password.value;
+
+        const response = await fetch("/api/admin/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, password }),
+        });
+
+        const data = await response.json();
+
+        if (data.message == "Authorized") {
+            token = data.token;
+
+            localStorage.setItem("token", token);
+
+            window.location.href = "/ui/admin";
+        } else {
+            alert("Login failed");
+        }
+    });
+</script>
